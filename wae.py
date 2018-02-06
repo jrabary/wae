@@ -199,6 +199,7 @@ class WAE(object):
         sample_pz = self.sample_noise
         if opts['z_test'] == 'gan':
             loss_gan, loss_match = self.gan_penalty(sample_qz, sample_pz)
+            print('use GAN penality')
         elif opts['z_test'] == 'mmd':
             loss_match = self.mmd_penalty(sample_qz, sample_pz)
         else:
@@ -381,12 +382,12 @@ class WAE(object):
         opts = self.opts
         steps_max = 200
         batch_size = opts['e_pretrain_sample_size']
-        for step in xrange(steps_max):
+        for step in range(steps_max):
             train_size = data.num_points
             data_ids = np.random.choice(train_size, min(train_size, batch_size),
                                         replace=False)
             batch_images = data.data[data_ids].astype(np.float)
-            batch_noise =  self.sample_pz(batch_size)
+            batch_noise = self.sample_pz(batch_size)
 
             [_, loss_pretrain] = self.sess.run(
                 [self.pretrain_opt,
@@ -420,14 +421,14 @@ class WAE(object):
             dot_prod = -1
             best_of_runs = 10e5 # Any positive value would do
             updated = False
-            for _ in xrange(3):
+            for _ in range(3):
                 # We will run 3 times from random inits
                 loss_prev = 10e5 # Any positive value would do
                 proj_vars = tf.get_collection(
                     tf.GraphKeys.GLOBAL_VARIABLES, scope='leastGaussian2d')
                 self.sess.run(tf.variables_initializer(proj_vars))
                 step = 0
-                for _ in xrange(5000):
+                for _ in range(5000):
                     self.sess.run(optim, feed_dict={sample:X})
                     step += 1
                     if step % 10 == 0:
@@ -454,7 +455,7 @@ class WAE(object):
         losses = []
         losses_rec = []
         losses_match = []
-        batches_num = data.num_points / opts['batch_size']
+        batches_num = int(data.num_points / opts['batch_size'])
         train_size = data.num_points
         self.num_pics = opts['plot_num_pics']
         self.fixed_noise = self.sample_pz(opts['plot_num_pics'])
@@ -471,7 +472,7 @@ class WAE(object):
         decay = 1.
         wait = 0
 
-        for epoch in xrange(opts["epoch_num"]):
+        for epoch in range(opts["epoch_num"]):
 
             # Update learning rate if necessary
 
@@ -497,7 +498,7 @@ class WAE(object):
 
             # Iterate over batches
 
-            for it in xrange(batches_num):
+            for it in range(batches_num):
 
                 # Sample batches of data points and Pz noise
 
@@ -669,13 +670,13 @@ def save_plots(opts, sample_train, sample_test,
         merged = np.vstack([recon, sample])
         r_ptr = 0
         w_ptr = 0
-        for _ in range(num_pics / 2):
+        for _ in range(num_pics // 2):
             merged[w_ptr] = sample[r_ptr]
             merged[w_ptr + 1] = recon[r_ptr]
             r_ptr += 1
             w_ptr += 2
 
-        for idx in xrange(num_pics):
+        for idx in range(num_pics):
             if greyscale:
                 pics.append(1. - merged[idx, :, :, :])
             else:
@@ -692,7 +693,7 @@ def save_plots(opts, sample_train, sample_test,
 
         assert len(sample) == num_pics
         pics = []
-        for idx in xrange(num_pics):
+        for idx in range(num_pics):
             if greyscale:
                 pics.append(1. - sample[idx, :, :, :])
             else:
@@ -702,6 +703,8 @@ def save_plots(opts, sample_train, sample_test,
         pics = np.array(pics)
         image = np.concatenate(np.split(pics, num_cols), axis=2)
         image = np.concatenate(image, axis=0)
+        image = np.clip(image, 0., 1.)
+        print(np.min(image), np.max(image))
         images.append(image)
 
     img1, img2, img3, img5 = images
@@ -710,10 +713,11 @@ def save_plots(opts, sample_train, sample_test,
     dpi = 100
     height_pic = img1.shape[0]
     width_pic = img1.shape[1]
-    fig_height = 4 * height_pic / float(dpi)
-    fig_width = 6 * width_pic / float(dpi)
+    fig_height = int(4 * height_pic / float(dpi))
+    fig_width = int(6 * width_pic / float(dpi))
 
     fig = plt.figure(figsize=(fig_width, fig_height))
+    print(fig)
     gs = matplotlib.gridspec.GridSpec(2, 3)
 
     # Filling in separate parts of the plot
@@ -784,8 +788,11 @@ def save_plots(opts, sample_train, sample_test,
     plt.grid(axis='y')
     plt.legend(loc='upper right')
 
+    print("==== GONA SAVE")
+
     # Saving
     utils.create_dir(opts['work_dir'])
     fig.savefig(utils.o_gfile((opts["work_dir"], filename), 'wb'),
                 dpi=dpi, format='png')
+
     plt.close()

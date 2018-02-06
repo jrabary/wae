@@ -84,7 +84,7 @@ def dcgan_encoder(opts, inputs, is_training=False, reuse=False):
     num_units = opts['e_num_filters']
     num_layers = opts['e_num_layers']
     layer_x = inputs
-    for i in xrange(num_layers):
+    for i in range(num_layers):
         scale = 2**(num_layers - i - 1)
         layer_x = ops.conv2d(opts, layer_x, num_units / scale,
                              scope='h%d_conv' % i)
@@ -185,21 +185,21 @@ def dcgan_decoder(opts, noise, is_training=False, reuse=False):
     batch_size = tf.shape(noise)[0]
     num_layers = opts['g_num_layers']
     if opts['g_arch'] == 'dcgan':
-        height = output_shape[0] / 2**num_layers
-        width = output_shape[1] / 2**num_layers
+        height = int(output_shape[0] / 2**num_layers)
+        width = int(output_shape[1] / 2**num_layers)
     elif opts['g_arch'] == 'dcgan_mod':
-        height = output_shape[0] / 2**(num_layers - 1)
-        width = output_shape[1] / 2**(num_layers - 1)
+        height = int(output_shape[0] / 2**(num_layers - 1))
+        width = int(output_shape[1] / 2**(num_layers - 1))
 
     h0 = ops.linear(
         opts, noise, num_units * height * width, scope='h0_lin')
     h0 = tf.reshape(h0, [-1, height, width, num_units])
     h0 = tf.nn.relu(h0)
     layer_x = h0
-    for i in xrange(num_layers - 1):
+    for i in range(num_layers - 1):
         scale = 2**(i + 1)
-        _out_shape = [batch_size, height * scale,
-                      width * scale, num_units / scale]
+        _out_shape = [batch_size, int(height * scale),
+                      int(width * scale), int(num_units / scale)]
         layer_x = ops.deconv2d(opts, layer_x, _out_shape,
                                scope='h%d_deconv' % i)
         if opts['batch_norm']:
@@ -307,7 +307,7 @@ def z_adversary(opts, inputs, reuse=False):
     # No convolutions as GAN happens in the latent space
     with tf.variable_scope('z_adversary', reuse=reuse):
         hi = inputs
-        for i in xrange(num_layers):
+        for i in range(num_layers):
             hi = ops.linear(opts, hi, num_units, scope='h%d_lin' % (i + 1))
             hi = tf.nn.relu(hi)
         hi = ops.linear(opts, hi, 1, scope='hfinal_lin')
@@ -321,7 +321,7 @@ def z_adversary(opts, inputs, reuse=False):
             # dQz(x) term. This appeared in the AVB paper.
             assert opts['pz'] == 'normal', \
                 'The GAN Pz trick is currently available only for Gaussian Pz'
-            sigma2_p = float(opts['pot_pz_scale']) ** 2
+            sigma2_p = float(opts['pz_scale']) ** 2
             normsq = tf.reduce_sum(tf.square(inputs), 1)
             hi = hi - normsq / 2. / sigma2_p \
                     - 0.5 * tf.log(2. * np.pi) \

@@ -6,13 +6,13 @@ config_celebA = {}
 config_celebA['dataset'] = 'celebA'
 config_celebA['verbose'] = True
 config_celebA['save_every_epoch'] = 20
-config_celebA['print_every'] = 500
+config_celebA['print_every'] = 20
 config_celebA['work_dir'] = 'results_celeba'
 config_celebA['plot_num_pics'] = 30
 config_celebA['plot_num_cols'] = 5
 
 config_celebA['input_normalize_sym'] = True
-config_celebA['data_dir'] = 'celebA/datasets/celeba/img_align_celeba'
+config_celebA['data_dir'] = '/Users/jaonary/Data/celebA/img_align_celeba'
 config_celebA['celebA_crop'] = 'closecrop' # closecrop, resizecrop
 
 config_celebA['optimizer'] = 'adam' # adam, sgd
@@ -30,7 +30,7 @@ config_celebA['batch_norm_decay'] = 0.9
 config_celebA['conv_filters_dim'] = 5
 
 config_celebA['e_is_random'] = False
-config_celebA['e_pretrain'] = True
+config_celebA['e_pretrain'] = False # True
 config_celebA['e_pretrain_sample_size'] = 256
 config_celebA['e_add_noise'] = True
 config_celebA['e_num_filters'] = 1024
@@ -49,7 +49,7 @@ config_celebA['zdim'] = 64
 config_celebA['pz'] = 'normal' # uniform, normal, sphere
 config_celebA['cost'] = 'l2sq' #l2, l2sq, l1
 config_celebA['pz_scale'] = 1.
-config_celebA['z_test'] = 'mmd'
+config_celebA['z_test'] = 'gan' # 'mmd'
 config_celebA['mmd_kernel'] = 'IMQ' # RBF, IMQ
 config_celebA['lambda'] = 10.
 

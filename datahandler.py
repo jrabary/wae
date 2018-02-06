@@ -151,7 +151,7 @@ class Data(object):
                 step = step if step is not None else 1
                 keys = range(start, stop, step)
             else:
-                print type(key)
+                print(type(key))
                 raise Exception('This type of indexing yet not supported for the dataset')
             res = []
             new_keys = []
@@ -587,8 +587,8 @@ class DataHandler(object):
 
         num_samples = 202599
 
-        datapoint_ids = range(1, num_samples + 1)
-        paths = ['%.6d.jpg' % i for i in xrange(1, num_samples + 1)]
+        datapoint_ids = list(range(1, num_samples + 1))
+        paths = ['%.6d.jpg' % i for i in range(1, num_samples + 1)]
         seed = 123
         random.seed(seed)
         random.shuffle(paths)

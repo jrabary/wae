@@ -18,6 +18,7 @@ def main():
 
     if FLAGS.dataset == 'celebA':
         opts = configs.config_celebA
+        print('use celeba config')
     elif FLAGS.dataset == 'mnist':
         opts = configs.config_mnist
     elif FLAGS.dataset == 'mnist_small':
@@ -27,10 +28,10 @@ def main():
     else:
         assert False, 'Unknown experiment configuration'
 
-    opts['zdim'] = FLAGS.zdim
-    opts['z_test'] = FLAGS.z_test
-    opts['work_dir'] = FLAGS.work_dir
-    opts['lambda'] = FLAGS.wae_lambda
+    # opts['zdim'] = FLAGS.zdim
+    # opts['z_test'] = FLAGS.z_test
+    # opts['work_dir'] = FLAGS.work_dir
+    # opts['lambda'] = FLAGS.wae_lambda
 
     if opts['verbose']:
         logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(message)s')
